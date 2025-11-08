@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { OnboardingWizard } from "@/features/onboarding/components/onboarding-wizard";
 import { createStyleGuide } from "@/features/onboarding/actions/create-style-guide";
 import type { OnboardingFormData } from "@/features/onboarding/lib/onboarding-schema";
+import { useI18n } from "@/lib/i18n/client";
 
 type NewStyleGuidePageProps = {
   params: Promise<Record<string, never>>;
@@ -18,14 +19,15 @@ export default function NewStyleGuidePage({
   void params;
   const router = useRouter();
   const { toast } = useToast();
+  const t = useI18n();
 
   const handleComplete = async (data: OnboardingFormData) => {
     try {
       const result = await createStyleGuide(data);
 
       toast({
-        title: "성공",
-        description: "스타일 가이드가 생성되었습니다.",
+        title: t("common.success"),
+        description: t("styleGuide.update.success.desc").replace("업데이트", "생성"),
       });
 
       // Redirect to style guides page
@@ -33,11 +35,11 @@ export default function NewStyleGuidePage({
     } catch (error) {
       console.error("Failed to create style guide:", error);
       toast({
-        title: "오류",
+        title: t("common.error"),
         description:
           error instanceof Error
             ? error.message
-            : "스타일 가이드 생성에 실패했습니다.",
+            : t("styleGuide.update.error.desc").replace("업데이트", "생성"),
         variant: "destructive",
       });
     }
@@ -53,7 +55,7 @@ export default function NewStyleGuidePage({
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          뒤로
+          {t("common.back")}
         </Button>
       </div>
 

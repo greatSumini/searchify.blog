@@ -11,6 +11,7 @@ import { useGenerateArticle } from "@/features/articles/hooks/useGenerateArticle
 import { useStyleGuide } from "@/features/articles/hooks/useStyleGuide";
 import { useState, useEffect } from "react";
 import type { GenerationFormData } from "@/features/articles/components/generation-form";
+import { useI18n } from "@/lib/i18n/client";
 
 type NewArticlePageProps = {
   params: Promise<Record<string, never>>;
@@ -18,6 +19,7 @@ type NewArticlePageProps = {
 
 export default function NewArticlePage({ params }: NewArticlePageProps) {
   void params;
+  const t = useI18n();
 
   const router = useRouter();
   const { toast } = useToast();
@@ -37,7 +39,7 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
     ? [
         {
           id: styleGuideData.id,
-          name: "내 스타일 가이드",
+          name: t("newArticle.default_style_guide"),
         },
       ]
     : [];
@@ -67,7 +69,7 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
         description:
           error instanceof Error
             ? error.message
-            : "AI 글 생성 중 오류가 발생했습니다.",
+            : t("newArticle.toast.error.desc"),
         variant: "destructive",
       });
       setIsGenerating(false);
@@ -88,8 +90,8 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
           const title = titleMatch ? titleMatch[1] : parsed.title;
 
           toast({
-            title: "AI 글 생성 완료",
-            description: `"${title}" 글이 생성되었습니다.`,
+            title: t("newArticle.toast.success.title"),
+            description: t("newArticle.toast.success.desc", { title }),
           });
 
           // For now, redirect to editor with the content in state
@@ -116,7 +118,7 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
             style={{ color: "#6B7280" }}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            뒤로 가기
+            {t("newArticle.back")}
           </Button>
         </div>
 

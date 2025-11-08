@@ -12,11 +12,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil } from "lucide-react";
+import { useI18n } from "@/lib/i18n/client";
 
 type Article = {
   id: string;
   title: string;
-  status: "완료" | "작성중";
+  status: "done" | "draft";
   createdAt: string;
 };
 
@@ -24,43 +25,44 @@ const dummyArticles: Article[] = [
   {
     id: "1",
     title: "Next.js 15의 새로운 기능 살펴보기",
-    status: "완료",
+    status: "done",
     createdAt: "2025-11-05",
   },
   {
     id: "2",
     title: "AI를 활용한 콘텐츠 마케팅 전략",
-    status: "완료",
+    status: "done",
     createdAt: "2025-11-03",
   },
   {
     id: "3",
     title: "인디해커를 위한 SEO 최적화 가이드",
-    status: "완료",
+    status: "done",
     createdAt: "2025-11-01",
   },
   {
     id: "4",
     title: "SaaS 제품의 성장 해킹 전략",
-    status: "작성중",
+    status: "draft",
     createdAt: "2025-10-28",
   },
 ];
 
 export function RecentArticlesList() {
+  const t = useI18n();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>최근 작성한 글</CardTitle>
+        <CardTitle>{t("dashboard.recent.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>상태</TableHead>
-              <TableHead>제목</TableHead>
-              <TableHead>생성일</TableHead>
-              <TableHead className="text-right">액션</TableHead>
+              <TableHead>{t("dashboard.recent.th.status")}</TableHead>
+              <TableHead>{t("dashboard.recent.th.title")}</TableHead>
+              <TableHead>{t("dashboard.recent.th.created_at")}</TableHead>
+              <TableHead className="text-right">{t("dashboard.recent.th.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -69,10 +71,10 @@ export function RecentArticlesList() {
                 <TableCell>
                   <Badge
                     variant={
-                      article.status === "완료" ? "default" : "secondary"
+                      article.status === "done" ? "default" : "secondary"
                     }
                   >
-                    {article.status}
+                    {article.status === "done" ? t("dashboard.status.done") : t("dashboard.status.draft")}
                   </Badge>
                 </TableCell>
                 <TableCell className="font-medium">{article.title}</TableCell>

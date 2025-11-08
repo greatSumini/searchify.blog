@@ -12,4 +12,10 @@
   "delete.success.desc": "The style guide has been deleted.",
   "delete.error.title": "Error",
   "delete.error.desc": "Failed to delete the style guide."
+  ,
+  "update.success.desc": "The style guide has been updated.",
+  "update.error.desc": "Failed to update the style guide.",
+  "edit.title": "Edit Style Guide",
+  "edit.hint": "To regenerate your style guide, go to the new guide creation page.",
+  "cancel": "Cancel"
 }

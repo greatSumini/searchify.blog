@@ -10,6 +10,7 @@ import { StyleGuideCard } from "@/features/onboarding/components/style-guide-car
 import { StyleGuidePreviewModal } from "@/features/onboarding/components/style-guide-preview-modal";
 import type { StyleGuideResponse } from "@/features/onboarding/backend/schema";
 import { getUserStyleGuide, deleteStyleGuideAction } from "@/features/articles/actions/article-actions";
+import { useI18n } from "@/lib/i18n/client";
 
 type StyleGuidePageProps = {
   params: Promise<Record<string, never>>;
@@ -20,6 +21,7 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
   const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const t = useI18n();
 
   const [previewGuide, setPreviewGuide] = useState<StyleGuideResponse | null>(
     null
@@ -55,26 +57,26 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
 
   const handleDelete = async (id: string) => {
     // Show confirmation dialog
-    if (!window.confirm("이 스타일 가이드를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+    if (!window.confirm(t("styleGuide.delete.confirm"))) {
       return;
     }
 
     try {
       await deleteStyleGuideAction(id);
       toast({
-        title: "삭제 완료",
-        description: "스타일 가이드가 삭제되었습니다.",
+        title: t("styleGuide.delete.success.title"),
+        description: t("styleGuide.delete.success.desc"),
       });
       // Clear cache and refetch
       await queryClient.invalidateQueries({ queryKey: ["userStyleGuide"] });
       await refetch();
     } catch (error) {
       toast({
-        title: "오류",
+        title: t("styleGuide.delete.error.title"),
         description:
           error instanceof Error
             ? error.message
-            : "스타일 가이드 삭제에 실패했습니다.",
+            : t("styleGuide.delete.error.desc"),
         variant: "destructive",
       });
     }
@@ -91,7 +93,7 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">로딩 중...</p>
+              <p className="text-muted-foreground">{t("styleGuide.loading")}</p>
             </div>
           </div>
         </div>
@@ -104,8 +106,8 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
       <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
         <div className="container mx-auto max-w-4xl px-4 py-8">
           <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-            <p className="text-red-500">스타일 가이드를 불러오는 데 실패했습니다.</p>
-            <Button onClick={() => router.refresh()}>다시 시도</Button>
+            <p className="text-red-500">{t("styleGuide.error.load")}</p>
+            <Button onClick={() => router.refresh()}>{t("styleGuide.retry")}</Button>
           </div>
         </div>
       </div>
@@ -118,16 +120,12 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
         {/* 헤더 */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: "#1F2937" }}>
-              스타일 가이드
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              AI 글 생성에 사용할 블로그의 스타일 가이드를 관리합니다.
-            </p>
+            <h1 className="text-3xl font-bold" style={{ color: "#1F2937" }}>{t("styleGuide.title")}</h1>
+            <p className="mt-2 text-muted-foreground">{t("styleGuide.subtitle")}</p>
           </div>
           <Button onClick={handleCreateNew} size="lg">
             <Plus className="mr-2 h-4 w-4" />
-            새 가이드 생성
+            {t("styleGuide.create_new")}
           </Button>
         </div>
 
@@ -146,10 +144,8 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
             className="rounded-lg border border-dashed p-12 text-center"
             style={{ borderColor: "#E1E5EA" }}
           >
-            <p className="mb-4 text-muted-foreground">
-              아직 생성된 스타일 가이드가 없습니다.
-            </p>
-            <Button onClick={handleCreateNew}>스타일 가이드 생성하기</Button>
+            <p className="mb-4 text-muted-foreground">{t("styleGuide.empty")}</p>
+            <Button onClick={handleCreateNew}>{t("styleGuide.create")}</Button>
           </div>
         )}
       </div>

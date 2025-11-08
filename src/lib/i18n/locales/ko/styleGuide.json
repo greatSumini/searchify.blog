@@ -12,4 +12,10 @@
   "delete.success.desc": "스타일 가이드가 삭제되었습니다.",
   "delete.error.title": "오류",
   "delete.error.desc": "스타일 가이드 삭제에 실패했습니다."
+  ,
+  "update.success.desc": "스타일 가이드가 업데이트되었습니다.",
+  "update.error.desc": "스타일 가이드 업데이트에 실패했습니다.",
+  "edit.title": "스타일 가이드 편집",
+  "edit.hint": "현재 스타일 가이드를 다시 생성하려면 새 가이드 생성 페이지로 이동하세요.",
+  "cancel": "취소"
 }
