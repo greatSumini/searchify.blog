@@ -15,12 +15,14 @@ import {
   CreateArticleRequestSchema,
   UpdateArticleRequestSchema,
   GenerateArticleRequestSchema,
+  ListArticlesQuerySchema,
 } from '@/features/articles/backend/schema';
 import {
   createArticle,
   getArticleById,
   updateArticle,
   deleteArticle,
+  listArticles,
 } from './service';
 import {
   articleErrorCodes,
@@ -31,6 +33,64 @@ import { checkQuota, incrementQuota } from './quota-service';
 import { generateUniqueSlug } from '@/lib/slug';
 
 export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
+  /**
+   * GET /api/articles
+   * Lists articles with pagination, filtering, and sorting
+   *
+   * Query params: limit, offset, status, sortBy, sortOrder
+   * Headers: x-clerk-user-id (required)
+   */
+  app.get('/api/articles', async (c) => {
+    // Get userId from header
+    const userId = c.req.header('x-clerk-user-id');
+
+    if (!userId) {
+      return respond(
+        c,
+        failure(
+          401,
+          articleErrorCodes.unauthorized,
+          'User ID is required. Please provide x-clerk-user-id header.',
+        ),
+      );
+    }
+
+    // Parse and validate query parameters
+    const queryParams = c.req.query();
+    const parsedQuery = ListArticlesQuerySchema.safeParse(queryParams);
+
+    if (!parsedQuery.success) {
+      return respond(
+        c,
+        failure(
+          400,
+          articleErrorCodes.validationError,
+          'Invalid query parameters. Please check your input.',
+          parsedQuery.error.format(),
+        ),
+      );
+    }
+
+    const supabase = getSupabase(c);
+    const logger = getLogger(c);
+
+    // List articles
+    const result = await listArticles(supabase, userId, parsedQuery.data);
+
+    if (!result.ok) {
+      const errorResult = result as ErrorResult<ArticleServiceError, unknown>;
+      logger.error('Failed to list articles', errorResult.error.message);
+      return respond(c, result);
+    }
+
+    logger.info('Articles listed successfully', {
+      userId,
+      count: result.data.articles.length,
+      total: result.data.total,
+    });
+    return respond(c, result);
+  });
+
   /**
    * POST /api/articles/draft
    * Creates a new article draft

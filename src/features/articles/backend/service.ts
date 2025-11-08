@@ -10,6 +10,8 @@ import {
   type ArticleResponse,
   type CreateArticleRequest,
   type UpdateArticleRequest,
+  type ListArticlesQuery,
+  type ListArticlesResponse,
 } from '@/features/articles/backend/schema';
 import {
   articleErrorCodes,
@@ -285,4 +287,75 @@ export const deleteArticle = async (
   }
 
   return success({ id: articleId }, 200);
+};
+
+/**
+ * Lists articles with pagination, filtering, and sorting
+ */
+export const listArticles = async (
+  client: SupabaseClient,
+  clerkUserId: string,
+  query: ListArticlesQuery,
+): Promise<HandlerResult<ListArticlesResponse, ArticleServiceError, unknown>> => {
+  const profileId = await getProfileIdByClerkId(client, clerkUserId);
+  if (!profileId) {
+    return failure(404, articleErrorCodes.notFound, 'Profile not found');
+  }
+
+  // Build the base query
+  let dbQuery = client
+    .from(ARTICLES_TABLE)
+    .select('*', { count: 'exact' })
+    .eq('profile_id', profileId);
+
+  // Apply status filter
+  if (query.status !== 'all') {
+    dbQuery = dbQuery.eq('status', query.status);
+  }
+
+  // Apply sorting
+  const sortColumn = query.sortBy;
+  const sortAscending = query.sortOrder === 'asc';
+  dbQuery = dbQuery.order(sortColumn, { ascending: sortAscending });
+
+  // Apply pagination
+  const from = query.offset;
+  const to = query.offset + query.limit - 1;
+  dbQuery = dbQuery.range(from, to);
+
+  const { data, error, count } = await dbQuery;
+
+  if (error) {
+    return failure(
+      500,
+      articleErrorCodes.fetchError,
+      `Failed to fetch articles: ${error.message}`,
+    );
+  }
+
+  if (!data) {
+    return success({
+      articles: [],
+      total: 0,
+      limit: query.limit,
+      offset: query.offset,
+    }, 200);
+  }
+
+  try {
+    const articles = data.map((row) => mapArticleRowToResponse(row));
+    return success({
+      articles,
+      total: count ?? 0,
+      limit: query.limit,
+      offset: query.offset,
+    }, 200);
+  } catch (err) {
+    return failure(
+      500,
+      articleErrorCodes.validationError,
+      'One or more article rows failed validation.',
+      err,
+    );
+  }
 };
