@@ -7,9 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, LoaderCircle } from "lucide-react";
 import { GenerationForm } from "@/features/articles/components/generation-form";
 import { GenerationProgress } from "@/features/articles/components/generation-progress";
-import { useGenerateArticle } from "@/features/articles/hooks/useGenerateArticle";
 import { useStyleGuide } from "@/features/articles/hooks/useStyleGuide";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { GenerationFormData } from "@/features/articles/components/generation-form";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -24,13 +23,6 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-
-  const {
-    generateArticle,
-    isLoading,
-    error,
-    completion,
-  } = useGenerateArticle();
 
   const { data: styleGuideData, isLoading: isLoadingStyleGuide } =
     useStyleGuide();
@@ -56,12 +48,42 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
         ? data.keywords.split(",").map((k) => k.trim())
         : [];
 
-      await generateArticle({
-        topic: data.topic,
-        styleGuideId: data.styleGuideId,
-        keywords,
-        additionalInstructions: undefined,
+      const response = await fetch("/api/articles/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          topic: data.topic,
+          styleGuideId: data.styleGuideId,
+          keywords,
+          additionalInstructions: undefined,
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message || t("newArticle.toast.error.desc")
+        );
+      }
+
+      const result = await response.json();
+      const articleId = result?.data?.article?.id;
+
+      if (!articleId) {
+        throw new Error("글 생성에 성공했지만 ID를 받지 못했습니다");
+      }
+
+      toast({
+        title: t("newArticle.toast.success.title"),
+        description: t("newArticle.toast.success.desc", {
+          title: result?.data?.article?.title || "새 글",
+        }),
+      });
+
+      // Redirect to edit page
+      router.push(`/articles/${articleId}/edit`);
     } catch (error) {
       console.error("Failed to generate article:", error);
       toast({
@@ -76,35 +98,6 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
     }
   };
 
-  // Monitor completion for article generation
-  useEffect(() => {
-    if (!isLoading && completion) {
-      try {
-        // Try to parse as JSON (structured content)
-        const parsed = JSON.parse(completion);
-
-        // If it looks like generated article content with title and content
-        if (parsed.title && parsed.content) {
-          // Extract title from the first line if it exists
-          const titleMatch = parsed.content.match(/^#\s+(.+)\n/);
-          const title = titleMatch ? titleMatch[1] : parsed.title;
-
-          toast({
-            title: t("newArticle.toast.success.title"),
-            description: t("newArticle.toast.success.desc", { title }),
-          });
-
-          // For now, redirect to editor with the content in state
-          // In a real app, you'd save to DB first
-          router.push(`/articles/new/content`);
-        }
-      } catch {
-        // Not JSON, might be plain text response
-      }
-
-      setIsGenerating(false);
-    }
-  }, [completion, isLoading, router, toast]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
@@ -130,10 +123,10 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
             borderRadius: "12px",
           }}
         >
-          {isGenerating || isLoading ? (
+          {isGenerating ? (
             <GenerationProgress
               isGenerating={true}
-              error={error}
+              error={null}
               onCancel={() => {
                 setIsGenerating(false);
               }}
