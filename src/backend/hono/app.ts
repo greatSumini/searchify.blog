@@ -4,12 +4,17 @@ import { withAppContext } from '@/backend/middleware/context';
 import { withSupabase } from '@/backend/middleware/supabase';
 import { registerExampleRoutes } from '@/features/example/backend/route';
 import { registerOnboardingRoutes } from '@/features/onboarding/backend/route';
+import { registerArticlesRoutes } from '@/features/articles/backend/route';
 import type { AppEnv } from '@/backend/hono/context';
 
 let singletonApp: Hono<AppEnv> | null = null;
 
 export const createHonoApp = () => {
-  if (singletonApp) {
+  // In development, always recreate the app to support HMR
+  // In production, use singleton pattern for performance
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  if (!isDevelopment && singletonApp) {
     return singletonApp;
   }
 
@@ -21,8 +26,12 @@ export const createHonoApp = () => {
 
   registerExampleRoutes(app);
   registerOnboardingRoutes(app);
+  registerArticlesRoutes(app);
 
-  singletonApp = app;
+  // Only cache in production
+  if (!isDevelopment) {
+    singletonApp = app;
+  }
 
   return app;
 };
