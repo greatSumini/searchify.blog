@@ -12,6 +12,7 @@ export {
   AIGeneratedContentSchema,
   ListArticlesQuerySchema,
   ListArticlesResponseSchema,
+  DashboardStatsResponseSchema,
   type CreateArticleRequest,
   type UpdateArticleRequest,
   type ArticleResponse,
@@ -20,4 +21,5 @@ export {
   type AIGeneratedContent,
   type ListArticlesQuery,
   type ListArticlesResponse,
+  type DashboardStatsResponse,
 } from '@/features/articles/backend/schema';

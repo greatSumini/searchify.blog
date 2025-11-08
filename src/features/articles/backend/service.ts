@@ -12,6 +12,7 @@ import {
   type UpdateArticleRequest,
   type ListArticlesQuery,
   type ListArticlesResponse,
+  type DashboardStatsResponse,
 } from '@/features/articles/backend/schema';
 import {
   articleErrorCodes,
@@ -358,4 +359,61 @@ export const listArticles = async (
       err,
     );
   }
+};
+
+/**
+ * Gets dashboard statistics for the user
+ */
+export const getDashboardStats = async (
+  client: SupabaseClient,
+  clerkUserId: string,
+): Promise<HandlerResult<DashboardStatsResponse, ArticleServiceError, unknown>> => {
+  const profileId = await getProfileIdByClerkId(client, clerkUserId);
+  if (!profileId) {
+    return failure(404, articleErrorCodes.notFound, 'Profile not found');
+  }
+
+  // Get all articles for the user
+  const { data, error } = await client
+    .from(ARTICLES_TABLE)
+    .select('status, created_at')
+    .eq('profile_id', profileId);
+
+  if (error) {
+    return failure(
+      500,
+      articleErrorCodes.fetchError,
+      `Failed to fetch dashboard stats: ${error.message}`,
+    );
+  }
+
+  const articles = data || [];
+
+  // Calculate stats
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const monthlyArticles = articles.filter((article) => {
+    const createdAt = new Date(article.created_at);
+    return (
+      createdAt.getMonth() === currentMonth &&
+      createdAt.getFullYear() === currentYear
+    );
+  }).length;
+
+  const totalArticles = articles.length;
+  const publishedArticles = articles.filter((a) => a.status === 'published').length;
+  const draftArticles = articles.filter((a) => a.status === 'draft').length;
+
+  // Estimate saved hours (assuming each article saves 2 hours on average)
+  const savedHours = totalArticles * 2;
+
+  return success({
+    monthlyArticles,
+    totalArticles,
+    publishedArticles,
+    draftArticles,
+    savedHours,
+  }, 200);
 };

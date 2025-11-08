@@ -7,22 +7,48 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, Clock } from "lucide-react";
+import { FileText, Clock, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n/client";
+import { useDashboardStats } from "@/features/articles/hooks/useDashboardStats";
 
-type StatsCardsProps = {
-  monthlyArticles?: number;
-  monthlyGoal?: number;
-  savedHours?: number;
-};
-
-export function StatsCards({
-  monthlyArticles = 4,
-  monthlyGoal = 10,
-  savedHours = 8,
-}: StatsCardsProps) {
-  const achievementRate = Math.round((monthlyArticles / monthlyGoal) * 100);
+export function StatsCards() {
   const t = useI18n();
+  const { data, isLoading, error } = useDashboardStats();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card>
+          <CardContent className="py-8 text-center text-sm text-muted-foreground">
+            {t("dashboard.stats.error") || "통계를 불러오는 중 오류가 발생했습니다"}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const stats = data?.data;
+  const monthlyArticles = stats?.monthlyArticles ?? 0;
+  const monthlyGoal = 10; // This can be made configurable in the future
+  const savedHours = stats?.savedHours ?? 0;
+  const achievementRate = monthlyGoal > 0 ? Math.round((monthlyArticles / monthlyGoal) * 100) : 0;
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

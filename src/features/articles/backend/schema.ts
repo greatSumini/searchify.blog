@@ -187,3 +187,14 @@ export const ListArticlesResponseSchema = z.object({
 });
 
 export type ListArticlesResponse = z.infer<typeof ListArticlesResponseSchema>;
+
+// Dashboard Stats Response Schema
+export const DashboardStatsResponseSchema = z.object({
+  monthlyArticles: z.number(),
+  totalArticles: z.number(),
+  publishedArticles: z.number(),
+  draftArticles: z.number(),
+  savedHours: z.number(),
+});
+
+export type DashboardStatsResponse = z.infer<typeof DashboardStatsResponseSchema>;

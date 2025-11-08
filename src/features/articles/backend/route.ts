@@ -23,6 +23,7 @@ import {
   updateArticle,
   deleteArticle,
   listArticles,
+  getDashboardStats,
 } from './service';
 import {
   articleErrorCodes,
@@ -88,6 +89,43 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
       count: result.data.articles.length,
       total: result.data.total,
     });
+    return respond(c, result);
+  });
+
+  /**
+   * GET /api/articles/stats
+   * Gets dashboard statistics for the current user
+   *
+   * Headers: x-clerk-user-id (required)
+   */
+  app.get('/api/articles/stats', async (c) => {
+    // Get userId from header
+    const userId = c.req.header('x-clerk-user-id');
+
+    if (!userId) {
+      return respond(
+        c,
+        failure(
+          401,
+          articleErrorCodes.unauthorized,
+          'User ID is required. Please provide x-clerk-user-id header.',
+        ),
+      );
+    }
+
+    const supabase = getSupabase(c);
+    const logger = getLogger(c);
+
+    // Get dashboard stats
+    const result = await getDashboardStats(supabase, userId);
+
+    if (!result.ok) {
+      const errorResult = result as ErrorResult<ArticleServiceError, unknown>;
+      logger.error('Failed to get dashboard stats', errorResult.error.message);
+      return respond(c, result);
+    }
+
+    logger.info('Dashboard stats retrieved successfully', { userId });
     return respond(c, result);
   });
 

@@ -178,6 +178,45 @@ export async function getArticle(articleId: string) {
 }
 
 /**
+ * Get dashboard statistics
+ */
+export async function getDashboardStats() {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/articles/stats`, {
+      method: "GET",
+      headers: {
+        "x-clerk-user-id": userId,
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Failed to get dashboard stats:", errorData);
+      throw new Error(
+        errorData.error?.message || "대시보드 통계를 불러오는데 실패했습니다"
+      );
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error getting dashboard stats:", error);
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : "대시보드 통계를 불러오는 중 오류가 발생했습니다"
+    );
+  }
+}
+
+/**
  * Get user's style guide
  */
 export async function getUserStyleGuide() {
