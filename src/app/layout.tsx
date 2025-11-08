@@ -1,11 +1,7 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
-
-export const metadata: Metadata = {
-  title: "콘텐츠메이커",
-  description: "AI 기반 콘텐츠 생성 SaaS",
-};
+import { getCurrentLocale } from "@/lib/i18n/server";
+import { I18nProvider } from "@/lib/i18n/client";
 
 /**
  * Root Layout
@@ -18,13 +14,14 @@ export const metadata: Metadata = {
  * - Static asset requests don't trigger Clerk middleware errors
  * - Clerk only runs on authenticated routes matched by middleware
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getCurrentLocale().catch(() => "ko");
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -34,7 +31,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans">
-        <Providers>{children}</Providers>
+        <I18nProvider locale={locale}>
+          <Providers>{children}</Providers>
+        </I18nProvider>
       </body>
     </html>
   );
