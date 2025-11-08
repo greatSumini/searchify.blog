@@ -8,6 +8,9 @@ export type AppConfig = {
     url: string;
     serviceRoleKey: string;
   };
+  google: {
+    generativeAiApiKey: string;
+  };
 };
 
 export type AppVariables = {

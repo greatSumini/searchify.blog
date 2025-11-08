@@ -127,3 +127,42 @@ export const ArticleResponseSchema = z.object({
 });
 
 export type ArticleResponse = z.infer<typeof ArticleResponseSchema>;
+
+// Generate Article Request Schema
+export const GenerateArticleRequestSchema = z.object({
+  topic: z
+    .string()
+    .min(1, '주제를 입력해주세요')
+    .max(200, '주제는 200자 이내로 입력해주세요'),
+  styleGuideId: z
+    .string()
+    .uuid('유효하지 않은 스타일 가이드 ID입니다')
+    .optional(),
+  keywords: z.array(z.string()).optional().default([]),
+  additionalInstructions: z
+    .string()
+    .max(1000, '추가 지시사항은 1000자 이내로 입력해주세요')
+    .optional(),
+});
+
+export type GenerateArticleRequest = z.infer<typeof GenerateArticleRequestSchema>;
+
+// AI Generated Content Schema (from Gemini)
+export const AIGeneratedContentSchema = z.object({
+  title: z.string(),
+  content: z.string(),
+  metaDescription: z.string(),
+  keywords: z.array(z.string()),
+  headings: z.array(z.string()),
+});
+
+export type AIGeneratedContent = z.infer<typeof AIGeneratedContentSchema>;
+
+// Generate Article Response Schema
+export const GenerateArticleResponseSchema = z.object({
+  article: ArticleResponseSchema,
+  generatedContent: AIGeneratedContentSchema,
+  quotaRemaining: z.number(),
+});
+
+export type GenerateArticleResponse = z.infer<typeof GenerateArticleResponseSchema>;

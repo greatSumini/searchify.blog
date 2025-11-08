@@ -7,7 +7,13 @@ export {
   ContentToneSchema,
   ContentLengthSchema,
   ReadingLevelSchema,
+  GenerateArticleRequestSchema,
+  GenerateArticleResponseSchema,
+  AIGeneratedContentSchema,
   type CreateArticleRequest,
   type UpdateArticleRequest,
   type ArticleResponse,
+  type GenerateArticleRequest,
+  type GenerateArticleResponse,
+  type AIGeneratedContent,
 } from '@/features/articles/backend/schema';
