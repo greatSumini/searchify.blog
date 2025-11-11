@@ -59,7 +59,7 @@ export function RecentArticlesList() {
     );
   }
 
-  const articles = data?.data?.articles || [];
+  const articles = data?.articles || [];
 
   const handleView = (articleId: string) => {
     // TODO: Implement article view page

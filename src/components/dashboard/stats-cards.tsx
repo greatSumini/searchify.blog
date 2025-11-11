@@ -44,7 +44,7 @@ export function StatsCards() {
     );
   }
 
-  const stats = data?.data;
+  const stats = data;
   const monthlyArticles = stats?.monthlyArticles ?? 0;
   const monthlyGoal = 10; // This can be made configurable in the future
   const savedHours = stats?.savedHours ?? 0;

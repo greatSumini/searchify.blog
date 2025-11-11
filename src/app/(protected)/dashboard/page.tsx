@@ -76,7 +76,7 @@ function DashboardContent() {
         <WelcomeBanner onDismiss={handleDismissBanner} />
       )}
       <WelcomeHeader userName={getUserName(user?.email)} />
-      <StatsCards monthlyArticles={4} monthlyGoal={10} savedHours={8} />
+      <StatsCards />
       <ActivityChart />
       <RecentArticlesList />
     </div>
