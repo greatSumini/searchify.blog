@@ -11,6 +11,7 @@ import { StyleGuidePreviewModal } from "@/features/onboarding/components/style-g
 import type { StyleGuideResponse } from "@/features/onboarding/backend/schema";
 import { getUserStyleGuide, deleteStyleGuideAction } from "@/features/articles/actions/article-actions";
 import { useI18n } from "@/lib/i18n/client";
+import { PageLayout } from "@/components/layout/page-layout";
 
 type StyleGuidePageProps = {
   params: Promise<Record<string, never>>;
@@ -72,66 +73,80 @@ export default function StyleGuidePage({ params }: StyleGuidePageProps) {
     router.push("/style-guides/new");
   };
 
+  const title = t("styleGuide.title");
+  const description = t("styleGuide.subtitle");
+  const actions = (
+    <Button onClick={handleCreateNew} size="lg">
+      <Plus className="mr-2 h-4 w-4" />
+      {t("styleGuide.create_new")}
+    </Button>
+  );
+
   if (isLoading) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">{t("styleGuide.loading")}</p>
-            </div>
+      <PageLayout
+        title={title}
+        description={description}
+        actions={actions}
+        maxWidthClassName="max-w-4xl"
+      >
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">{t("styleGuide.loading")}</p>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (isError) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-            <p className="text-red-500">{t("styleGuide.error.load")}</p>
-            <Button onClick={() => router.refresh()}>{t("styleGuide.retry")}</Button>
-          </div>
+      <PageLayout
+        title={title}
+        description={description}
+        actions={actions}
+        maxWidthClassName="max-w-4xl"
+      >
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <p className="text-red-500">{t("styleGuide.error.load")}</p>
+          <Button onClick={() => router.refresh()}>{t("styleGuide.retry")}</Button>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: "#1F2937" }}>{t("styleGuide.title")}</h1>
-            <p className="mt-2 text-muted-foreground">{t("styleGuide.subtitle")}</p>
-          </div>
-          <Button onClick={handleCreateNew} size="lg">
-            <Plus className="mr-2 h-4 w-4" />
-            {t("styleGuide.create_new")}
-          </Button>
+    <PageLayout
+      title={title}
+      description={description}
+      actions={actions}
+      maxWidthClassName="max-w-4xl"
+    >
+      {guide ? (
+        <div className="space-y-4">
+          <StyleGuideCard
+            guide={guide}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onPreview={handlePreview}
+          />
         </div>
+      ) : (
+        <div
+          className="rounded-lg border border-dashed p-12 text-center"
+          style={{ borderColor: "#E1E5EA" }}
+        >
+          <p className="mb-4 text-muted-foreground">{t("styleGuide.empty")}</p>
+          <Button onClick={handleCreateNew}>{t("styleGuide.create")}</Button>
+        </div>
+      )}
 
-        {guide ? (
-          <div className="space-y-4">
-            <StyleGuideCard
-              guide={guide}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onPreview={handlePreview}
-            />
-          </div>
-        ) : (
-          <div className="rounded-lg border border-dashed p-12 text-center" style={{ borderColor: "#E1E5EA" }}>
-            <p className="mb-4 text-muted-foreground">{t("styleGuide.empty")}</p>
-            <Button onClick={handleCreateNew}>{t("styleGuide.create")}</Button>
-          </div>
-        )}
-      </div>
-
-      <StyleGuidePreviewModal guide={previewGuide} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
-    </div>
+      <StyleGuidePreviewModal
+        guide={previewGuide}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
+    </PageLayout>
   );
 }

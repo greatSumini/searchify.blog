@@ -12,6 +12,7 @@ import type { StyleGuideResponse } from "@/features/onboarding/backend/schema";
 import type { OnboardingFormData } from "@/features/onboarding/lib/onboarding-schema";
 import { getUserStyleGuide } from "@/features/articles/actions/article-actions";
 import { useI18n } from "@/lib/i18n/client";
+import { PageLayout } from "@/components/layout/page-layout";
 
 type EditStyleGuidePageProps = {
   params: Promise<{ id: string }>;
@@ -46,52 +47,59 @@ export default function EditStyleGuidePage({ params }: EditStyleGuidePageProps) 
 
   if (isLoading) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">{t("styleGuide.loading")}</p>
-            </div>
+      <PageLayout
+        title={t("styleGuide.edit.title")}
+        description={t("styleGuide.edit.hint")}
+        maxWidthClassName="max-w-4xl"
+      >
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">{t("styleGuide.loading")}</p>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (isError || !guide) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-        <div className="container mx-auto max-w-4xl px-4 py-8">
-          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-            <p className="text-red-500">{t("styleGuide.error.load")}</p>
-            <Button onClick={() => router.back()}>{t("common.back")}</Button>
-          </div>
+      <PageLayout
+        title={t("styleGuide.edit.title")}
+        description={t("styleGuide.edit.hint")}
+        maxWidthClassName="max-w-4xl"
+      >
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <p className="text-red-500">{t("styleGuide.error.load")}</p>
+          <Button onClick={() => router.back()}>{t("common.back")}</Button>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-      <div className="container mx-auto max-w-4xl px-4 py-4">
+    <PageLayout
+      title={t("styleGuide.edit.title")}
+      description={t("styleGuide.edit.hint")}
+      maxWidthClassName="max-w-4xl"
+      actions={
+        <div className="flex gap-2">
+          <Button onClick={() => router.push("/style-guides/new")}>
+            {t("styleGuide.create_new")}
+          </Button>
+          <Button variant="outline" onClick={() => router.back()}>
+            {t("styleGuide.cancel")}
+          </Button>
+        </div>
+      }
+    >
+      <div className="mb-4">
         <Button variant="ghost" onClick={() => router.back()} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t("common.back")}
         </Button>
       </div>
-
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <div className="rounded-lg border p-6" style={{ borderColor: "#E1E5EA" }}>
-          <h1 className="text-2xl font-bold mb-4" style={{ color: "#1F2937" }}>{t("styleGuide.edit.title")}</h1>
-          <p className="text-muted-foreground mb-6">{t("styleGuide.edit.hint")}</p>
-          <div className="flex gap-2">
-            <Button onClick={() => router.push("/style-guides/new")}>{t("styleGuide.create_new")}</Button>
-            <Button variant="outline" onClick={() => router.back()}>{t("styleGuide.cancel")}</Button>
-          </div>
-        </div>
-      </div>
-    </div>
+      {/* TODO: 스타일 가이드 편집 폼/위저드 추가 예정 */}
+    </PageLayout>
   );
 }
-

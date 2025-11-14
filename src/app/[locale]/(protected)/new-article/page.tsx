@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PageLayout } from "@/components/layout/page-layout";
 
 type NewArticlePageProps = {
   params: Promise<Record<string, never>>;
@@ -171,129 +172,155 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
   const generatingPreview = useMemo(() => completion, [completion]);
   const generatingParsed = useMemo(() => parseStreamingTextToJson(generatingPreview || ""), [generatingPreview]);
 
-  
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-      <div className="container mx-auto max-w-2xl px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-            className="mb-4 -ml-2"
-            style={{ color: "#6B7280" }}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("newArticle.back")}
-          </Button>
-        </div>
-
-        {/* Main Card */}
-        <Card
-          className="p-8"
-          style={{
-            borderColor: "#E1E5EA",
-            borderRadius: "12px",
-          }}
+    <PageLayout
+      title="새 글 생성"
+      description="AI를 활용해 블로그 글 초안을 빠르게 만들어보세요."
+      maxWidthClassName="max-w-2xl"
+    >
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          onClick={handleBack}
+          className="-ml-2"
+          style={{ color: "#6B7280" }}
         >
-          {mode === "form" && (
-            <GenerationForm
-              styleGuides={styleGuides}
-              onSubmit={handleGenerateSubmit}
-              isLoading={isLoadingStyleGuide}
-            />
-          )}
-
-          {mode === "generating" && (
-            <div className="space-y-6">
-
-              <div className="rounded-lg border p-4" style={{ borderColor: "#E1E5EA" }}>
-                <p className="text-sm mb-3" style={{ color: "#6B7280" }}>
-                  AI가 글을 작성하고 있습니다. 잠시만 기다려주세요.
-                </p>
-                <div className="max-h-96 overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-32">항목</TableHead>
-                        <TableHead>값</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>제목</TableCell>
-                        <TableCell>{generatingParsed.title || "(분석 중...)"}</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>메타 설명</TableCell>
-                        <TableCell>
-                          {(generatingParsed.metaDescription || "").slice(0, 160) || "(분석 중...)"}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>키워드</TableCell>
-                        <TableCell>
-                          {generatingParsed.keywords && generatingParsed.keywords.length > 0
-                            ? generatingParsed.keywords.slice(0, 10).join(", ")
-                            : "(분석 중...)"}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>소제목</TableCell>
-                        <TableCell>
-                          {generatingParsed.headings && generatingParsed.headings.length > 0
-                            ? generatingParsed.headings.slice(0, 5).join(" / ")
-                            : "(분석 중...)"}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>본문 미리보기</TableCell>
-                        <TableCell>
-                          <div className="whitespace-pre-wrap">
-                            {(generatingParsed.content || generatingPreview || "").slice(0, 300)}
-                            {((generatingParsed.content || generatingPreview || "").length ?? 0) > 300 ? "..." : ""}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {mode === "complete" && parsed && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">{parsed.title}</h2>
-                {parsed.metaDescription && (
-                  <p className="text-sm" style={{ color: "#6B7280" }}>
-                    {parsed.metaDescription}
-                  </p>
-                )}
-              </div>
-              <div className="prose prose-neutral max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{parsed.content}</ReactMarkdown>
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setMode("form");
-                    setParsed(null);
-                  }}
-                  style={{ borderRadius: "8px" }}
-                >
-                  다시하기
-                </Button>
-                <Button onClick={handleSave} className="px-6" style={{ backgroundColor: "#3BA2F8", borderRadius: "8px" }}>
-                  저장하기
-                </Button>
-              </div>
-            </div>
-          )}
-        </Card>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t("newArticle.back")}
+        </Button>
       </div>
-    </div>
+
+      <Card
+        className="p-8"
+        style={{
+          borderColor: "#E1E5EA",
+          borderRadius: "12px",
+        }}
+      >
+        {mode === "form" && (
+          <GenerationForm
+            styleGuides={styleGuides}
+            onSubmit={handleGenerateSubmit}
+            isLoading={isLoadingStyleGuide}
+          />
+        )}
+
+        {mode === "generating" && (
+          <div className="space-y-6">
+            <div
+              className="rounded-lg border p-4"
+              style={{ borderColor: "#E1E5EA" }}
+            >
+              <p className="mb-3 text-sm" style={{ color: "#6B7280" }}>
+                AI가 글을 작성하고 있습니다. 잠시만 기다려주세요.
+              </p>
+              <div className="max-h-96 overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-32">항목</TableHead>
+                      <TableHead>값</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>제목</TableCell>
+                      <TableCell>
+                        {generatingParsed.title || "(분석 중...)"}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>메타 설명</TableCell>
+                      <TableCell>
+                        {(generatingParsed.metaDescription || "").slice(
+                          0,
+                          160,
+                        ) || "(분석 중...)"}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>키워드</TableCell>
+                      <TableCell>
+                        {generatingParsed.keywords &&
+                        generatingParsed.keywords.length > 0
+                          ? generatingParsed.keywords
+                              .slice(0, 10)
+                              .join(", ")
+                          : "(분석 중...)"}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>소제목</TableCell>
+                      <TableCell>
+                        {generatingParsed.headings &&
+                        generatingParsed.headings.length > 0
+                          ? generatingParsed.headings
+                              .slice(0, 5)
+                              .join(" / ")
+                          : "(분석 중...)"}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>본문 미리보기</TableCell>
+                      <TableCell>
+                        <div className="whitespace-pre-wrap">
+                          {(
+                            generatingParsed.content ||
+                            generatingPreview ||
+                            ""
+                          ).slice(0, 300)}
+                          {((generatingParsed.content ||
+                            generatingPreview ||
+                            "").length ?? 0) > 300
+                            ? "..."
+                            : ""}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {mode === "complete" && parsed && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-2 text-2xl font-bold">{parsed.title}</h2>
+              {parsed.metaDescription && (
+                <p className="text-sm" style={{ color: "#6B7280" }}>
+                  {parsed.metaDescription}
+                </p>
+              )}
+            </div>
+            <div className="prose prose-neutral max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {parsed.content}
+              </ReactMarkdown>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setMode("form");
+                  setParsed(null);
+                }}
+                style={{ borderRadius: "8px" }}
+              >
+                다시하기
+              </Button>
+              <Button
+                onClick={handleSave}
+                className="px-6"
+                style={{ backgroundColor: "#3BA2F8", borderRadius: "8px" }}
+              >
+                저장하기
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
+    </PageLayout>
   );
 }

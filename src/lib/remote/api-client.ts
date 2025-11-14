@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from "axios";
+import axios, { isAxiosError, type AxiosRequestConfig } from "axios";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
@@ -35,6 +35,26 @@ export const extractApiErrorMessage = (
   }
 
   return fallbackMessage;
+};
+
+/**
+ * Helper to create API client with Clerk authentication headers
+ * Should be called from Client Components with useAuth hook
+ */
+export const createAuthenticatedClient = (userId: string | null | undefined) => {
+  if (!userId) {
+    return apiClient;
+  }
+
+  const authenticatedClient = axios.create({
+    ...apiClient.defaults,
+    headers: {
+      ...apiClient.defaults.headers,
+      "x-clerk-user-id": userId,
+    },
+  });
+
+  return authenticatedClient;
 };
 
 export { apiClient, isAxiosError };

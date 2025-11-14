@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getUserStyleGuide } from "../actions/article-actions";
+import { useAuth } from "@clerk/nextjs";
+import { createAuthenticatedClient, extractApiErrorMessage } from "@/lib/remote/api-client";
 
 export interface StyleGuideData {
   id: string;
@@ -23,8 +24,29 @@ export interface StyleGuideData {
 }
 
 export const useStyleGuide = () => {
-  return useQuery<StyleGuideData, Error>({
-    queryKey: ["styleGuide"],
-    queryFn: getUserStyleGuide,
+  const { userId } = useAuth();
+
+  return useQuery<StyleGuideData | null, Error>({
+    queryKey: ["styleGuide", userId],
+    queryFn: async () => {
+      if (!userId) {
+        throw new Error("User ID is required");
+      }
+
+      try {
+        const client = createAuthenticatedClient(userId);
+        const response = await client.get(`/api/style-guides/${userId}`);
+        return response.data as StyleGuideData;
+      } catch (error: any) {
+        // Handle 404 - return null if not found
+        if (error.response?.status === 404) {
+          return null;
+        }
+
+        const message = extractApiErrorMessage(error, "스타일 가이드를 불러오는데 실패했습니다");
+        throw new Error(message);
+      }
+    },
+    enabled: !!userId,
   });
 };

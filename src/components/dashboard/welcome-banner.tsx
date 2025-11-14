@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n/client";
@@ -14,6 +14,13 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
 
+  const handleDismiss = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onDismiss?.();
+    }, 250); // Wait for animation to complete
+  }, [onDismiss]);
+
   // Mount animation
   useEffect(() => {
     setIsVisible(true);
@@ -24,7 +31,7 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
     }, 10000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [handleDismiss]);
 
   // Handle ESC key for accessibility
   useEffect(() => {
@@ -36,14 +43,7 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onDismiss?.();
-    }, 250); // Wait for animation to complete
-  };
+  }, [handleDismiss]);
 
   const handleCTAClick = () => {
     router.push("/new-article");

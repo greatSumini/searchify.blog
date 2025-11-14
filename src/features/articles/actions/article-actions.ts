@@ -10,6 +10,7 @@ import type {
 const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 /**
+ * @deprecated Use useCreateArticle hook with apiClient instead
  * Create a new article draft
  */
 export async function createArticleDraft(data: CreateArticleRequest) {
@@ -48,6 +49,7 @@ export async function createArticleDraft(data: CreateArticleRequest) {
 }
 
 /**
+ * @deprecated Use useUpdateArticle hook with apiClient instead
  * Update an existing article draft
  */
 export async function updateArticleDraft(
@@ -89,6 +91,7 @@ export async function updateArticleDraft(
 }
 
 /**
+ * @deprecated Use useListArticles hook with apiClient instead
  * List articles with optional filtering and pagination
  */
 export async function listArticles(query?: Partial<ListArticlesQuery>) {
@@ -139,6 +142,7 @@ export async function listArticles(query?: Partial<ListArticlesQuery>) {
 }
 
 /**
+ * @deprecated Use useArticle hook with apiClient instead
  * Get an article by ID
  */
 export async function getArticle(articleId: string) {
@@ -178,6 +182,7 @@ export async function getArticle(articleId: string) {
 }
 
 /**
+ * @deprecated Use useDashboardStats hook with apiClient instead
  * Get dashboard statistics
  */
 export async function getDashboardStats() {

@@ -8,6 +8,7 @@ import { OnboardingWizard } from "@/features/onboarding/components/onboarding-wi
 import { createStyleGuide } from "@/features/onboarding/actions/create-style-guide";
 import type { OnboardingFormData } from "@/features/onboarding/lib/onboarding-schema";
 import { useI18n } from "@/lib/i18n/client";
+import { PageLayout } from "@/components/layout/page-layout";
 
 type NewStyleGuidePageProps = {
   params: Promise<Record<string, never>>;
@@ -45,14 +46,18 @@ export default function NewStyleGuidePage({
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FCFCFD" }}>
-      <div className="container mx-auto max-w-4xl px-4 py-4">
+    <PageLayout
+      title={t("styleGuide.title")}
+      description={t("styleGuide.subtitle")}
+      maxWidthClassName="max-w-4xl"
+    >
+      <div className="mb-4">
         <Button variant="ghost" onClick={() => router.back()} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t("common.back")}
         </Button>
       </div>
       <OnboardingWizard onComplete={handleComplete} />
-    </div>
+    </PageLayout>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n/client";
+import { PageLayout } from "@/components/layout/page-layout";
 
 type AccountPageProps = {
   params: Promise<Record<string, never>>;
@@ -11,9 +12,12 @@ export default function AccountPage({ params }: AccountPageProps) {
   const t = useI18n();
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-3xl font-bold">{t("common.account_management")}</h1>
-      <p className="text-muted-foreground">{t("common.coming_soon")}</p>
-    </div>
+    <PageLayout
+      title={t("common.account_management")}
+      description={t("common.coming_soon")}
+      maxWidthClassName="max-w-3xl"
+    >
+      <></>
+    </PageLayout>
   );
 }

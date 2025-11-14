@@ -31,6 +31,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { KeywordPicker } from "@/features/keywords/components/KeywordPicker";
+import { SuggestionsDialog } from "@/features/keywords/components/SuggestionsDialog";
 import { Sparkles } from "lucide-react";
 
 const GenerationFormSchema = z.object({
@@ -206,15 +207,36 @@ export function GenerationForm({
                 키워드 (선택사항)
               </FormLabel>
               <FormControl>
-                <KeywordPicker
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  placeholder="저장된 키워드에서 선택..."
-                  disabled={isSubmitting || isLoading}
-                />
+                <div className="space-y-2">
+                  <KeywordPicker
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="저장된 키워드에서 선택..."
+                    disabled={isSubmitting || isLoading}
+                  />
+                  <div className="flex justify-end">
+                    <SuggestionsDialog
+                      onKeywordsAdded={(added) => {
+                        const current = field.value || [];
+                        const merged = Array.from(new Set([...current, ...added]));
+                        field.onChange(merged);
+                      }}
+                    >
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isSubmitting || isLoading}
+                      >
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        연관 검색어 찾기
+                      </Button>
+                    </SuggestionsDialog>
+                  </div>
+                </div>
               </FormControl>
               <FormDescription>
-                저장된 키워드 중에서 선택하거나 검색하여 추가하세요
+                키워드 관리에서 저장한 키워드(연관 검색어 포함)를 검색해 선택할 수 있어요
               </FormDescription>
               <FormMessage />
             </FormItem>

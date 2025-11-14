@@ -125,6 +125,27 @@ export function parseGeneratedText(raw: string): ParsedAIArticle {
 }
 
 /**
+ * Markdown 텍스트에서 헤딩(제목) 추출
+ */
+function extractHeadings(text: string): Array<{ level: number; text: string }> {
+  const headings: Array<{ level: number; text: string }> = [];
+  const lines = text.split(/\r?\n/);
+
+  for (const line of lines) {
+    // Match markdown headings (# H1, ## H2, etc.)
+    const match = line.match(/^(#{1,6})\s+(.+)$/);
+    if (match) {
+      headings.push({
+        level: match[1].length,
+        text: match[2].trim(),
+      });
+    }
+  }
+
+  return headings;
+}
+
+/**
  * 스트리밍 중간 텍스트를 안전하게 JSON 형태로 파싱합니다.
  * - 절대 throw 하지 않습니다.
  * - 일부만 파싱되어도 가능한 정보만 채워 반환합니다.
