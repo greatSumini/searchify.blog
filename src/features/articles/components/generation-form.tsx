@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { KeywordPicker } from "@/features/keywords/components/KeywordPicker";
 import { Sparkles } from "lucide-react";
 
 const GenerationFormSchema = z.object({
@@ -30,10 +31,7 @@ const GenerationFormSchema = z.object({
     .min(2, "주제는 2자 이상이어야 합니다")
     .max(200, "주제는 200자 이내여야 합니다"),
   styleGuideId: z.string().uuid("유효한 스타일 가이드를 선택해주세요"),
-  keywords: z
-    .string()
-    .max(500, "키워드는 500자 이내여야 합니다")
-    .optional(),
+  keywords: z.array(z.string()).optional(),
 });
 
 export type GenerationFormData = z.infer<typeof GenerationFormSchema>;
@@ -56,7 +54,7 @@ export function GenerationForm({
     defaultValues: {
       topic: "",
       styleGuideId: styleGuides[0]?.id || "",
-      keywords: "",
+      keywords: [],
     },
   });
 
@@ -161,19 +159,15 @@ export function GenerationForm({
                 키워드 (선택사항)
               </FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="쉼표로 구분하여 여러 키워드를 입력할 수 있습니다"
+                <KeywordPicker
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  placeholder="저장된 키워드에서 선택..."
                   disabled={isSubmitting || isLoading}
-                  className="h-12 text-base"
-                  style={{
-                    borderColor: "#E1E5EA",
-                    borderRadius: "8px",
-                  }}
                 />
               </FormControl>
               <FormDescription>
-                글에 포함시키고 싶은 키워드를 쉼표로 구분하여 입력하세요
+                저장된 키워드 중에서 선택하거나 검색하여 추가하세요
               </FormDescription>
               <FormMessage />
             </FormItem>

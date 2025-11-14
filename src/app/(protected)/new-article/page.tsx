@@ -44,9 +44,7 @@ export default function NewArticlePage({ params }: NewArticlePageProps) {
     setIsGenerating(true);
 
     try {
-      const keywords = data.keywords
-        ? data.keywords.split(",").map((k) => k.trim())
-        : [];
+      const keywords = data.keywords || [];
 
       const response = await fetch("/api/articles/generate", {
         method: "POST",

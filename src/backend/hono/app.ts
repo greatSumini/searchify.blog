@@ -6,6 +6,7 @@ import { registerExampleRoutes } from '@/features/example/backend/route';
 import { registerOnboardingRoutes } from '@/features/onboarding/backend/route';
 import { registerArticlesRoutes } from '@/features/articles/backend/route';
 import { registerProfilesRoutes } from '@/features/profiles/backend/route';
+import { registerKeywordsRoutes } from '@/features/keywords/backend/route';
 import type { AppEnv } from '@/backend/hono/context';
 
 let singletonApp: Hono<AppEnv> | null = null;
@@ -29,6 +30,7 @@ export const createHonoApp = () => {
   registerOnboardingRoutes(app);
   registerArticlesRoutes(app);
   registerProfilesRoutes(app);
+  registerKeywordsRoutes(app);
 
   // Only cache in production
   if (!isDevelopment) {

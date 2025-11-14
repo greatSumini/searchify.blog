@@ -5,6 +5,8 @@ const envSchema = z.object({
   SUPABASE_URL: z.string().url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
+  DATAFORSEO_LOGIN: z.string().min(1),
+  DATAFORSEO_PASSWORD: z.string().min(1),
 });
 
 let cachedConfig: AppConfig | null = null;
@@ -18,6 +20,8 @@ export const getAppConfig = (): AppConfig => {
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    DATAFORSEO_LOGIN: process.env.DATAFORSEO_LOGIN,
+    DATAFORSEO_PASSWORD: process.env.DATAFORSEO_PASSWORD,
   });
 
   if (!parsed.success) {
@@ -34,6 +38,10 @@ export const getAppConfig = (): AppConfig => {
     },
     google: {
       generativeAiApiKey: parsed.data.GOOGLE_GENERATIVE_AI_API_KEY,
+    },
+    dataForSEO: {
+      login: parsed.data.DATAFORSEO_LOGIN,
+      password: parsed.data.DATAFORSEO_PASSWORD,
     },
   } satisfies AppConfig;
 

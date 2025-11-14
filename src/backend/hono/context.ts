@@ -11,6 +11,10 @@ export type AppConfig = {
   google: {
     generativeAiApiKey: string;
   };
+  dataForSEO: {
+    login: string;
+    password: string;
+  };
 };
 
 export type AppVariables = {
