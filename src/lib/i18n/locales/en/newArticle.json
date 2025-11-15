@@ -1,8 +1,0 @@
-{
-  "back": "Go back",
-  "default_style_guide": "My Style Guide",
-  "toast.error.title": "Generation Failed",
-  "toast.error.desc": "An error occurred while generating the article.",
-  "toast.success.title": "AI Article Generated",
-  "toast.success.desc": "The article \"{title}\" has been generated."
-}

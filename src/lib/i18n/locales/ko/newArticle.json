@@ -1,8 +1,0 @@
-{
-  "back": "뒤로 가기",
-  "default_style_guide": "내 스타일 가이드",
-  "toast.error.title": "생성 실패",
-  "toast.error.desc": "AI 글 생성 중 오류가 발생했습니다.",
-  "toast.success.title": "AI 글 생성 완료",
-  "toast.success.desc": "\"{title}\" 글이 생성되었습니다."
-}
