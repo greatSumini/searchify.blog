@@ -21,37 +21,63 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome",
-    "welcome_header.greeting": "Hello, {userName}!",
-    "welcome_header.subtitle": "Create great content today.",
-    "welcome_header.new_article": "New Article",
-    "stats.monthly_articles_title": "Articles completed this month",
-    "stats.monthly_articles_suffix": "items",
-    "stats.goal_achievement": "You've achieved {rate}% of your goal!",
-    "stats.saved_time_title": "Total time saved",
-    "stats.saved_time_suffix": "hours",
-    "stats.saved_time_desc": "Time saved this month",
-    "recent.title": "Recently created articles",
-    "recent.th.status": "Status",
-    "recent.th.title": "Title",
-    "recent.th.created_at": "Created At",
-    "recent.th.actions": "Actions",
-    "status.done": "Done",
-    "status.draft": "Draft",
-    "banner.title": "Welcome! 🎉",
-    "banner.desc": "All set. Start creating your first AI-powered content!",
-    "banner.cta": "Create First Article",
-    "banner.cta_aria": "Go to create first article",
-    "banner.close_aria": "Close welcome message",
-    "activity.title": "Monthly Activity Chart",
-    "activity.placeholder": "The chart library (e.g., Recharts) will be displayed here"
+    "welcome_header": {
+      "greeting": "Hello, {userName}!",
+      "subtitle": "Create great content today.",
+      "new_article": "New Article"
+    },
+    "stats": {
+      "monthly_articles_title": "Articles completed this month",
+      "monthly_articles_suffix": "items",
+      "goal_achievement": "You've achieved {rate}% of your goal!",
+      "saved_time_title": "Total time saved",
+      "saved_time_suffix": "hours",
+      "saved_time_desc": "Time saved this month"
+    },
+    "recent": {
+      "title": "Recently created articles",
+      "error": "An error occurred while loading the article list",
+      "empty": "No articles written yet",
+      "th": {
+        "status": "Status",
+        "title": "Title",
+        "created_at": "Created At",
+        "actions": "Actions"
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit"
+      }
+    },
+    "status": {
+      "done": "Done",
+      "draft": "Draft"
+    },
+    "banner": {
+      "title": "Welcome! 🎉",
+      "desc": "All set. Start creating your first AI-powered content!",
+      "cta": "Create First Article",
+      "cta_aria": "Go to create first article",
+      "close_aria": "Close welcome message"
+    },
+    "activity": {
+      "title": "Monthly Activity Chart",
+      "placeholder": "The chart library (e.g., Recharts) will be displayed here"
+    }
   },
   "newArticle": {
     "back": "Go back",
     "default_style_guide": "My Style Guide",
-    "toast.error.title": "Generation Failed",
-    "toast.error.desc": "An error occurred while generating the article.",
-    "toast.success.title": "AI Article Generated",
-    "toast.success.desc": "The article \"{title}\" has been generated."
+    "toast": {
+      "error": {
+        "title": "Generation Failed",
+        "desc": "An error occurred while generating the article."
+      },
+      "success": {
+        "title": "AI Article Generated",
+        "desc": "The article \"{title}\" has been generated."
+      }
+    }
   },
   "styleGuide": {
     "title": "Style Guide",
@@ -60,18 +86,34 @@
     "empty": "No style guides created yet.",
     "create": "Create Style Guide",
     "loading": "Loading...",
-    "error.load": "Failed to load the style guide.",
     "retry": "Retry",
-    "delete.confirm": "Delete this style guide? This action cannot be undone.",
-    "delete.success.title": "Deleted",
-    "delete.success.desc": "The style guide has been deleted.",
-    "delete.error.title": "Error",
-    "delete.error.desc": "Failed to delete the style guide.",
-    "update.success.desc": "The style guide has been updated.",
-    "update.error.desc": "Failed to update the style guide.",
-    "edit.title": "Edit Style Guide",
-    "edit.hint": "To regenerate your style guide, go to the new guide creation page.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "error": {
+      "load": "Failed to load the style guide."
+    },
+    "delete": {
+      "confirm": "Delete this style guide? This action cannot be undone.",
+      "success": {
+        "title": "Deleted",
+        "desc": "The style guide has been deleted."
+      },
+      "error": {
+        "title": "Error",
+        "desc": "Failed to delete the style guide."
+      }
+    },
+    "update": {
+      "success": {
+        "desc": "The style guide has been updated."
+      },
+      "error": {
+        "desc": "Failed to update the style guide."
+      }
+    },
+    "edit": {
+      "title": "Edit Style Guide",
+      "hint": "To regenerate your style guide, go to the new guide creation page."
+    }
   },
   "metadata": {
     "title": "SEO24",
