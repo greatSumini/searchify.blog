@@ -4,10 +4,10 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Sidebar } from "./sidebar";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
-import { useI18n } from "@/lib/i18n/client";
+import { useTranslations } from 'next-intl';
 
 export function Header() {
-  const t = useI18n();
+  const t = useTranslations();
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
       <div className="flex items-center gap-4">

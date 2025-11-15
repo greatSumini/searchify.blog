@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { errorBoundary } from '@/backend/middleware/error';
 import { withAppContext } from '@/backend/middleware/context';
 import { withSupabase } from '@/backend/middleware/supabase';
+import { withClerkAuth } from '@/backend/middleware/clerk-auth';
 import { registerExampleRoutes } from '@/features/example/backend/route';
 import { registerOnboardingRoutes } from '@/features/onboarding/backend/route';
 import { registerArticlesRoutes } from '@/features/articles/backend/route';
@@ -22,9 +23,13 @@ export const createHonoApp = () => {
 
   const app = new Hono<AppEnv>();
 
+  // Global middleware (applied to all routes)
   app.use('*', errorBoundary());
   app.use('*', withAppContext());
   app.use('*', withSupabase());
+
+  // Authentication middleware (applied to all /api routes)
+  app.use('/api/*', withClerkAuth());
 
   registerExampleRoutes(app);
   registerOnboardingRoutes(app);

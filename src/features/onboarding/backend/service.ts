@@ -19,10 +19,10 @@ const STYLE_GUIDES_TABLE = 'style_guides';
 import { ensureProfile, getProfileIdByClerkId } from '@/features/profiles/backend/service';
 
 /**
- * Creates or updates a style guide for a user
- * Uses UPSERT to handle repeat onboarding flows
+ * Creates a new style guide for a user
+ * Always creates a new record (users can have multiple style guides)
  */
-export const upsertStyleGuide = async (
+export const createStyleGuide = async (
   client: SupabaseClient,
   clerkUserId: string,
   data: CreateStyleGuideRequest,
@@ -50,16 +50,13 @@ export const upsertStyleGuide = async (
     content_length: data.contentLength,
     reading_level: data.readingLevel,
     notes: data.notes || null,
-    is_default: true, // Always true for MVP (one guide per user)
+    is_default: false, // New guides are not default by default
   };
 
-  // Use UPSERT to handle users going through onboarding multiple times
+  // Use INSERT to always create a new record
   const { data: savedData, error } = await client
     .from(STYLE_GUIDES_TABLE)
-    .upsert(dbRecord, {
-      onConflict: 'profile_id', // Update if user already exists
-      ignoreDuplicates: false,
-    })
+    .insert(dbRecord)
     .select('*')
     .single();
 
@@ -123,11 +120,89 @@ export const upsertStyleGuide = async (
 };
 
 /**
- * Gets the style guide for a user
- * Returns the user's default style guide (one guide per user in MVP)
+ * Gets all style guides for a user
+ * Returns all style guides ordered by creation date (newest first)
  */
-export const getStyleGuide = async (
+export const listStyleGuides = async (
   client: SupabaseClient,
+  clerkUserId: string,
+): Promise<DomainResult<StyleGuideResponse[], StyleGuideDomainError>> => {
+  const profileId = await getProfileIdByClerkId(client, clerkUserId);
+  if (!profileId) {
+    return domainFailure({ code: styleGuideErrorCodes.notFound, message: 'Profile not found' });
+  }
+  const { data, error } = await client
+    .from(STYLE_GUIDES_TABLE)
+    .select('*')
+    .eq('profile_id', profileId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return domainFailure({
+      code: styleGuideErrorCodes.fetchError,
+      message: `Failed to fetch style guides: ${error.message}`,
+    });
+  }
+
+  if (!data || data.length === 0) {
+    return domainSuccess([]);
+  }
+
+  // Validate and map each row
+  const mappedGuides: StyleGuideResponse[] = [];
+  for (const row of data) {
+    const rowParse = StyleGuideTableRowSchema.safeParse(row);
+
+    if (!rowParse.success) {
+      return domainFailure({
+        code: styleGuideErrorCodes.validationError,
+        message: 'Style guide row failed validation.',
+        details: rowParse.error.format(),
+      });
+    }
+
+    const mapped = {
+      id: rowParse.data.id,
+      profileId: rowParse.data.profile_id,
+      brandName: rowParse.data.brand_name,
+      brandDescription: rowParse.data.brand_description,
+      personality: rowParse.data.personality,
+      formality: rowParse.data.formality,
+      targetAudience: rowParse.data.target_audience,
+      painPoints: rowParse.data.pain_points,
+      language: rowParse.data.language,
+      tone: rowParse.data.tone,
+      contentLength: rowParse.data.content_length,
+      readingLevel: rowParse.data.reading_level,
+      notes: rowParse.data.notes,
+      isDefault: rowParse.data.is_default,
+      createdAt: rowParse.data.created_at,
+      updatedAt: rowParse.data.updated_at,
+    } satisfies StyleGuideResponse;
+
+    const parsed = StyleGuideResponseSchema.safeParse(mapped);
+
+    if (!parsed.success) {
+      return domainFailure({
+        code: styleGuideErrorCodes.validationError,
+        message: 'Style guide response failed validation.',
+        details: parsed.error.format(),
+      });
+    }
+
+    mappedGuides.push(parsed.data);
+  }
+
+  return domainSuccess(mappedGuides);
+};
+
+/**
+ * Gets a single style guide by ID
+ * Used for viewing/editing a specific guide
+ */
+export const getStyleGuideById = async (
+  client: SupabaseClient,
+  guideId: string,
   clerkUserId: string,
 ): Promise<DomainResult<StyleGuideResponse, StyleGuideDomainError>> => {
   const profileId = await getProfileIdByClerkId(client, clerkUserId);
@@ -137,6 +212,7 @@ export const getStyleGuide = async (
   const { data, error } = await client
     .from(STYLE_GUIDES_TABLE)
     .select('*')
+    .eq('id', guideId)
     .eq('profile_id', profileId)
     .single();
 

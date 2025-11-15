@@ -12,14 +12,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Loader2 } from "lucide-react";
-import { useI18n } from "@/lib/i18n/client";
+import { useTranslations } from 'next-intl';
 import { useListArticles } from "@/features/articles/hooks/useListArticles";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/i18n/navigation';
 
 export function RecentArticlesList() {
-  const t = useI18n();
+  const t = useTranslations('dashboard');
   const router = useRouter();
   const { data, isLoading, error } = useListArticles({
     query: {
@@ -33,7 +33,7 @@ export function RecentArticlesList() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("dashboard.recent.title")}</CardTitle>
+          <CardTitle>{t("recent.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -48,11 +48,11 @@ export function RecentArticlesList() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("dashboard.recent.title")}</CardTitle>
+          <CardTitle>{t("recent.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            {t("dashboard.recent.error") || "글 목록을 불러오는 중 오류가 발생했습니다"}
+            {t("recent.error", {}, { default: "글 목록을 불러오는 중 오류가 발생했습니다" })}
           </div>
         </CardContent>
       </Card>
@@ -74,11 +74,11 @@ export function RecentArticlesList() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("dashboard.recent.title")}</CardTitle>
+          <CardTitle>{t("recent.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            {t("dashboard.recent.empty") || "아직 작성한 글이 없습니다"}
+            {t("recent.empty", {}, { default: "아직 작성한 글이 없습니다" })}
           </div>
         </CardContent>
       </Card>
@@ -88,16 +88,16 @@ export function RecentArticlesList() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("dashboard.recent.title")}</CardTitle>
+        <CardTitle>{t("recent.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("dashboard.recent.th.status")}</TableHead>
-              <TableHead>{t("dashboard.recent.th.title")}</TableHead>
-              <TableHead>{t("dashboard.recent.th.created_at")}</TableHead>
-              <TableHead className="text-right">{t("dashboard.recent.th.actions")}</TableHead>
+              <TableHead>{t("recent.th.status")}</TableHead>
+              <TableHead>{t("recent.th.title")}</TableHead>
+              <TableHead>{t("recent.th.created_at")}</TableHead>
+              <TableHead className="text-right">{t("recent.th.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -109,7 +109,7 @@ export function RecentArticlesList() {
                       article.status === "published" ? "default" : "secondary"
                     }
                   >
-                    {article.status === "published" ? t("dashboard.status.done") : t("dashboard.status.draft")}
+                    {article.status === "published" ? t("status.done") : t("status.draft")}
                   </Badge>
                 </TableCell>
                 <TableCell className="font-medium">{article.title}</TableCell>
@@ -122,7 +122,7 @@ export function RecentArticlesList() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleView(article.id)}
-                      title={t("dashboard.recent.actions.view") || "보기"}
+                      title={t("recent.actions.view", {}, { default: "보기" })}
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -130,7 +130,7 @@ export function RecentArticlesList() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(article.id)}
-                      title={t("dashboard.recent.actions.edit") || "수정"}
+                      title={t("recent.actions.edit", {}, { default: "수정" })}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>

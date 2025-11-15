@@ -1,13 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/i18n/navigation';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { OnboardingWizard } from "@/features/onboarding/components/onboarding-wizard";
 import { createStyleGuide } from "@/features/onboarding/actions/create-style-guide";
 import type { OnboardingFormData } from "@/features/onboarding/lib/onboarding-schema";
-import { useI18n } from "@/lib/i18n/client";
+import { useTranslations } from 'next-intl';
 import { PageLayout } from "@/components/layout/page-layout";
 
 type NewStyleGuidePageProps = {
@@ -20,7 +20,7 @@ export default function NewStyleGuidePage({
   void params;
   const router = useRouter();
   const { toast } = useToast();
-  const t = useI18n();
+  const t = useTranslations();
 
   const handleComplete = async (data: OnboardingFormData) => {
     try {

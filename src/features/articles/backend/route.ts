@@ -8,6 +8,7 @@ import {
   getLogger,
   getSupabase,
   getConfig,
+  getClerkUserId,
   type AppEnv,
 } from '@/backend/hono/context';
 import {
@@ -37,22 +38,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
    * Lists articles with pagination, filtering, and sorting
    *
    * Query params: limit, offset, status, sortBy, sortOrder
-   * Headers: x-clerk-user-id (required)
    */
   app.get('/api/articles', async (c) => {
-    // Get userId from header
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
+    const userId = getClerkUserId(c);
 
     // Parse and validate query parameters
     const queryParams = c.req.query();
@@ -90,23 +78,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
   /**
    * GET /api/articles/stats
    * Gets dashboard statistics for the current user
-   *
-   * Headers: x-clerk-user-id (required)
    */
   app.get('/api/articles/stats', async (c) => {
-    // Get userId from header
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
+    const userId = getClerkUserId(c);
 
     const supabase = getSupabase(c);
     const logger = getLogger(c);
@@ -126,22 +100,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
    * Creates a new article draft
    *
    * Request body: CreateArticleRequest
-   * Headers: x-clerk-user-id (required)
    */
   app.post('/api/articles/draft', async (c) => {
-    // Get userId from header (passed from server action)
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
+    const userId = getClerkUserId(c);
 
     // Parse and validate request body
     const body = await c.req.json();
@@ -177,23 +138,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
    * Gets an article by ID
    *
    * URL params: id (article UUID)
-   * Headers: x-clerk-user-id (required)
    */
   app.get('/api/articles/:id', async (c) => {
-    // Get userId from header
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
-
+    const userId = getClerkUserId(c);
     const articleId = c.req.param('id');
 
     if (!articleId) {
@@ -226,23 +173,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
    *
    * URL params: id (article UUID)
    * Request body: UpdateArticleRequest
-   * Headers: x-clerk-user-id (required)
    */
   app.patch('/api/articles/:id', async (c) => {
-    // Get userId from header
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
-
+    const userId = getClerkUserId(c);
     const articleId = c.req.param('id');
 
     if (!articleId) {
@@ -295,23 +228,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
    * Deletes an article
    *
    * URL params: id (article UUID)
-   * Headers: x-clerk-user-id (required)
    */
   app.delete('/api/articles/:id', async (c) => {
-    // Get userId from header
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
-
+    const userId = getClerkUserId(c);
     const articleId = c.req.param('id');
 
     if (!articleId) {
@@ -343,22 +262,9 @@ export const registerArticlesRoutes = (app: Hono<AppEnv>) => {
    * Generates a new article using AI (Google Gemini)
    *
    * Request body: GenerateArticleRequest
-   * Headers: x-clerk-user-id (required)
    */
   app.post('/api/articles/generate', async (c) => {
-    // Get userId from header
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          articleErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
+    const userId = getClerkUserId(c);
 
     // Parse and validate request body
     const body = await c.req.json();

@@ -1,17 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, PenTool, FileText, User, Menu, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useI18n } from "@/lib/i18n/client";
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import Image from "next/image";
 
 function SidebarContent() {
   const pathname = usePathname();
-  const t = useI18n();
+  const t = useTranslations();
   const menuItems = [
     { icon: LayoutDashboard, label: t("sidebar.dashboard"), href: "/dashboard" },
     { icon: PenTool, label: t("sidebar.new_article"), href: "/new-article" },

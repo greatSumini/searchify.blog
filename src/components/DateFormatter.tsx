@@ -1,8 +1,8 @@
 "use client";
-import { useCurrentLocale } from "@/lib/i18n/client";
+import { useLocale } from 'next-intl';
 
 export function DateFormatter({ date }: { date: Date }) {
-  const locale = useCurrentLocale();
+  const locale = useLocale();
   const formattedDate = new Intl.DateTimeFormat(locale, {
     dateStyle: 'long',
     timeStyle: 'short',

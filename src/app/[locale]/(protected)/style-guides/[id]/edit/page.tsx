@@ -1,17 +1,17 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useRouter } from '@/i18n/navigation';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { OnboardingWizard } from "@/features/onboarding/components/onboarding-wizard";
-import { updateStyleGuideAction } from "@/features/articles/actions/article-actions";
-import type { StyleGuideResponse } from "@/features/onboarding/backend/schema";
 import type { OnboardingFormData } from "@/features/onboarding/lib/onboarding-schema";
-import { getUserStyleGuide } from "@/features/articles/actions/article-actions";
-import { useI18n } from "@/lib/i18n/client";
+import {
+  useStyleGuide,
+  useUpdateStyleGuide,
+} from "@/features/articles/hooks/useStyleGuideQuery";
+import { useTranslations } from 'next-intl';
 import { PageLayout } from "@/components/layout/page-layout";
 
 type EditStyleGuidePageProps = {
@@ -23,23 +23,26 @@ export default function EditStyleGuidePage({ params }: EditStyleGuidePageProps) 
   const guideId = resolvedParams.id;
   const router = useRouter();
   const { toast } = useToast();
-  const t = useI18n();
+  const t = useTranslations();
 
-  const { data: guide, isLoading, isError } = useQuery<StyleGuideResponse | null>({
-    queryKey: ["userStyleGuide", guideId],
-    queryFn: getUserStyleGuide,
-    retry: false,
-  });
+  const { data: guide, isLoading, isError } = useStyleGuide(guideId);
+  const updateStyleGuide = useUpdateStyleGuide();
 
   const handleComplete = async (data: OnboardingFormData) => {
     try {
-      await updateStyleGuideAction(guideId, data);
-      toast({ title: t("common.success"), description: t("styleGuide.update.success.desc") });
-      router.push("/style-guides");
+      await updateStyleGuide.mutateAsync({ guideId, data });
+      toast({
+        title: t("common.success"),
+        description: t("styleGuide.update.success.desc"),
+      });
+      router.push("/style-guide");
     } catch (error) {
       toast({
         title: t("common.error"),
-        description: error instanceof Error ? error.message : t("styleGuide.update.error.desc"),
+        description:
+          error instanceof Error
+            ? error.message
+            : t("styleGuide.update.error.desc"),
         variant: "destructive",
       });
     }

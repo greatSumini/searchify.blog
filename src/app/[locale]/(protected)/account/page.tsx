@@ -1,6 +1,6 @@
 "use client";
 
-import { useI18n } from "@/lib/i18n/client";
+import { useTranslations } from 'next-intl';
 import { PageLayout } from "@/components/layout/page-layout";
 
 type AccountPageProps = {
@@ -9,7 +9,7 @@ type AccountPageProps = {
 
 export default function AccountPage({ params }: AccountPageProps) {
   void params;
-  const t = useI18n();
+  const t = useTranslations();
 
   return (
     <PageLayout

@@ -2,15 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { X, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useI18n } from "@/lib/i18n/client";
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 interface WelcomeBannerProps {
   onDismiss?: () => void;
 }
 
 export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
-  const t = useI18n();
+  const t = useTranslations('dashboard.banner');
   const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
 
@@ -74,9 +74,9 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
               <Sparkles className="w-5 h-5 text-[#3BA2F8]" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <h3 className="text-[16px] font-semibold text-[#1E2A38] mb-1">{t("dashboard.banner.title")}</h3>
+              <h3 className="text-[16px] font-semibold text-[#1E2A38] mb-1">{t("title")}</h3>
               <p className="text-[14px] text-[#374151] leading-[1.5]">
-                {t("dashboard.banner.desc")}
+                {t("desc")}
               </p>
             </div>
           </div>
@@ -101,9 +101,9 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
                 focus:ring-offset-2
                 h-[40px]
               "
-              aria-label={t("dashboard.banner.cta_aria")}
+              aria-label={t("cta_aria")}
             >
-              {t("dashboard.banner.cta")}
+              {t("cta")}
             </button>
             <button
               onClick={handleDismiss}
@@ -119,7 +119,7 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
                 focus:ring-[#3BA2F8]
                 focus:ring-offset-2
               "
-              aria-label={t("dashboard.banner.close_aria")}
+              aria-label={t("close_aria")}
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </button>

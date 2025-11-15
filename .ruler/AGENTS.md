@@ -9,7 +9,7 @@
 - Hono 라우트 경로는 반드시 `/api` prefix를 포함해야 함 (Next.js API 라우트가 `/api/[[...hono]]`에 위치하므로). 예: `app.post('/api/auth/signup', ...)`
 - `AppLogger`는 `info`, `error`, `warn`, `debug` 메서드만 제공함. `logger.log()` 대신 `logger.info()` 사용할 것.
 - API 응답 스키마에서 `redirectTo` 등 경로 필드는 `z.string().url()` 대신 `z.string()` 사용 (상대 경로 허용).
-- **Before starting development**: Run `npm run env:check` to verify `.env.local` is properly configured.
+- **Before starting development**: Run `pnpm env:check` to verify `.env.local` is properly configured.
 
 ## Library
 
@@ -199,16 +199,16 @@ use following libraries for specific functionalities:
 
 ### Test Commands
 
-- `npm run test` - Run unit tests only
-- `npm run test:e2e` - Run E2E tests only
-- `npm run test:all` - **Run unit and E2E tests concurrently (recommended for CI/CD)**
-- Use `npm run test:all` for fast parallel test execution
+- `pnpm test` - Run unit tests only
+- `pnpm test:e2e` - Run E2E tests only
+- `pnpm test:all` - **Run unit and E2E tests concurrently (recommended for CI/CD)**
+- Use `pnpm test:all` for fast parallel test execution
 
 ## Environment Variables
 
 ### Validation
 
-- Run `npm run env:check` to validate `.env.local` configuration
+- Run `pnpm env:check` to validate `.env.local` configuration
 - This command checks all required environment variables using zod schemas
 - Always run this before development or deployment
 
@@ -224,7 +224,7 @@ Must be set in `.env.local`:
 
 ```bash
 # Validate environment variables
-npm run env:check
+pnpm env:check
 
 # If validation fails, check error output for missing/invalid variables
 # Update .env.local accordingly and re-run validation
@@ -252,7 +252,7 @@ npm run env:check
 
 ## Package Manager
 
-- use npm as package manager.
+- use pnpm as package manager.
 
 ## Korean Text
 

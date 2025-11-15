@@ -6,10 +6,11 @@ import { respondWithDomain, respondCreated } from '@/backend/http/mapper';
 import {
   getLogger,
   getSupabase,
+  getClerkUserId,
   type AppEnv,
 } from '@/backend/hono/context';
 import { CreateStyleGuideRequestSchema } from '@/features/onboarding/backend/schema';
-import { upsertStyleGuide, getStyleGuide, updateStyleGuide, deleteStyleGuide, markOnboardingCompleted } from './service';
+import { createStyleGuide, listStyleGuides, getStyleGuideById, updateStyleGuide, deleteStyleGuide, markOnboardingCompleted } from './service';
 import {
   styleGuideErrorCodes,
 } from './error';
@@ -17,25 +18,12 @@ import {
 export const registerOnboardingRoutes = (app: Hono<AppEnv>) => {
   /**
    * POST /api/style-guides
-   * Creates or updates a style guide for a user
+   * Creates a new style guide for a user
    *
    * Request body: OnboardingFormData
-   * Headers: x-clerk-user-id (required)
    */
   app.post('/api/style-guides', async (c) => {
-    // Get userId from header (passed from server action)
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          styleGuideErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
+    const userId = getClerkUserId(c);
 
     // Parse and validate request body
     const body = await c.req.json();
@@ -56,72 +44,64 @@ export const registerOnboardingRoutes = (app: Hono<AppEnv>) => {
     const supabase = getSupabase(c);
     const logger = getLogger(c);
 
-    // Save to database
-    const result = await upsertStyleGuide(supabase, userId, parsedBody.data);
+    // Create new style guide
+    const result = await createStyleGuide(supabase, userId, parsedBody.data);
 
     if (result.ok) {
-      logger.info('Style guide saved successfully', { userId });
+      logger.info('Style guide created successfully', { userId });
     }
 
     return respondCreated(c, result);
   });
 
   /**
-   * GET /api/style-guides/:userId
-   * Gets the style guide for a user
-   *
-   * URL params: userId (Clerk user ID)
-   * Headers: x-clerk-user-id (required for authorization)
+   * GET /api/style-guides
+   * Gets all style guides for a user
    */
-  app.get('/api/style-guides/:userId', async (c) => {
-    // Get requesting user ID from header
-    const requestingUserId = c.req.header('x-clerk-user-id');
+  app.get('/api/style-guides', async (c) => {
+    const userId = getClerkUserId(c);
+    const supabase = getSupabase(c);
+    const logger = getLogger(c);
 
-    if (!requestingUserId) {
-      return c.json(
-        failure(
-          401,
-          styleGuideErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
+    // Get all style guides
+    const result = await listStyleGuides(supabase, userId);
+
+    if (result.ok) {
+      logger.info('Style guides retrieved successfully', { userId, count: result.value.length });
     }
 
-    // Get target user ID from URL param
-    const targetUserId = c.req.param('userId');
+    return respondWithDomain(c, result);
+  });
 
-    if (!targetUserId) {
+  /**
+   * GET /api/style-guides/:id
+   * Gets a single style guide by ID
+   *
+   * URL params: id (style guide ID)
+   */
+  app.get('/api/style-guides/:id', async (c) => {
+    const userId = getClerkUserId(c);
+    const guideId = c.req.param('id');
+
+    if (!guideId) {
       return c.json(
         failure(
           400,
           styleGuideErrorCodes.validationError,
-          'User ID parameter is required.',
+          'Style guide ID is required.',
         ),
         400
-      );
-    }
-
-    // Verify that requesting user can only access their own style guide
-    if (requestingUserId !== targetUserId) {
-      return c.json(
-        failure(
-          403,
-          styleGuideErrorCodes.unauthorized,
-          'You can only access your own style guide.',
-        ),
-        403
       );
     }
 
     const supabase = getSupabase(c);
     const logger = getLogger(c);
 
-    // Get style guide
-    const result = await getStyleGuide(supabase, targetUserId);
+    // Get style guide by ID
+    const result = await getStyleGuideById(supabase, guideId, userId);
 
     if (result.ok) {
-      logger.info('Style guide retrieved successfully', { userId: targetUserId });
+      logger.info('Style guide retrieved successfully', { userId, guideId });
     }
 
     return respondWithDomain(c, result);
@@ -133,22 +113,10 @@ export const registerOnboardingRoutes = (app: Hono<AppEnv>) => {
    *
    * URL params: id (style guide ID)
    * Request body: OnboardingFormData
-   * Headers: x-clerk-user-id (required)
    */
   app.patch('/api/style-guides/:id', async (c) => {
-    const userId = c.req.header('x-clerk-user-id');
+    const userId = getClerkUserId(c);
     const guideId = c.req.param('id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          styleGuideErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
 
     if (!guideId) {
       return c.json(
@@ -195,22 +163,10 @@ export const registerOnboardingRoutes = (app: Hono<AppEnv>) => {
    * Deletes a style guide for a user
    *
    * URL params: id (style guide ID)
-   * Headers: x-clerk-user-id (required)
    */
   app.delete('/api/style-guides/:id', async (c) => {
-    const userId = c.req.header('x-clerk-user-id');
+    const userId = getClerkUserId(c);
     const guideId = c.req.param('id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          styleGuideErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
 
     if (!guideId) {
       return c.json(
@@ -240,24 +196,9 @@ export const registerOnboardingRoutes = (app: Hono<AppEnv>) => {
    * PATCH /api/onboarding/complete
    * Marks onboarding as completed for a user
    * This ensures the middleware can check completion status from DB
-   *
-   * Headers: x-clerk-user-id (required)
    */
   app.patch('/api/onboarding/complete', async (c) => {
-    // Get userId from header (passed from server action)
-    const userId = c.req.header('x-clerk-user-id');
-
-    if (!userId) {
-      return c.json(
-        failure(
-          401,
-          styleGuideErrorCodes.unauthorized,
-          'User ID is required. Please provide x-clerk-user-id header.',
-        ),
-        401
-      );
-    }
-
+    const userId = getClerkUserId(c);
     const supabase = getSupabase(c);
     const logger = getLogger(c);
 

@@ -21,6 +21,7 @@ export type AppVariables = {
   supabase: SupabaseClient;
   logger: AppLogger;
   config: AppConfig;
+  clerkUserId: string;
 };
 
 export type AppEnv = {
@@ -33,6 +34,7 @@ export const contextKeys = {
   supabase: 'supabase',
   logger: 'logger',
   config: 'config',
+  clerkUserId: 'clerkUserId',
 } as const satisfies Record<keyof AppVariables, keyof AppVariables>;
 
 export const getSupabase = (c: AppContext) =>
@@ -43,3 +45,6 @@ export const getLogger = (c: AppContext) =>
 
 export const getConfig = (c: AppContext) =>
   c.get(contextKeys.config) as AppConfig;
+
+export const getClerkUserId = (c: AppContext) =>
+  c.get(contextKeys.clerkUserId) as string;

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/i18n/navigation';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { GenerationForm } from "@/features/articles/components/generation-form";
 import { useStyleGuide } from "@/features/articles/hooks/useStyleGuide";
 import type { GenerationFormData } from "@/features/articles/components/generation-form";
-import { useI18n } from "@/lib/i18n/client";
+import { useTranslations } from 'next-intl';
 import { useCompletion } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

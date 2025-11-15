@@ -154,11 +154,6 @@ export function GenerationForm({
             />
           </form>
         </Form>
-
-        {/* Helper Text */}
-        <p className="text-center text-sm text-gray-500">
-          AI가 SEO에 최적화된 블로그 글을 자동으로 생성합니다
-        </p>
       </div>
     </div>
   );

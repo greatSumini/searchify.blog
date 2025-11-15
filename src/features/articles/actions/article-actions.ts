@@ -33,9 +33,7 @@ export async function createArticleDraft(data: CreateArticleRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error("Failed to create article draft:", errorData);
-      throw new Error(
-        errorData.error?.message || "글 작성에 실패했습니다"
-      );
+      throw new Error(errorData.error?.message || "글 작성에 실패했습니다");
     }
 
     const result = await response.json();
@@ -75,9 +73,7 @@ export async function updateArticleDraft(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error("Failed to update article draft:", errorData);
-      throw new Error(
-        errorData.error?.message || "글 수정에 실패했습니다"
-      );
+      throw new Error(errorData.error?.message || "글 수정에 실패했습니다");
     }
 
     const result = await response.json();
@@ -105,13 +101,16 @@ export async function listArticles(query?: Partial<ListArticlesQuery>) {
     // Build query string
     const params = new URLSearchParams();
     if (query?.limit !== undefined) params.append("limit", String(query.limit));
-    if (query?.offset !== undefined) params.append("offset", String(query.offset));
+    if (query?.offset !== undefined)
+      params.append("offset", String(query.offset));
     if (query?.status) params.append("status", query.status);
     if (query?.sortBy) params.append("sortBy", query.sortBy);
     if (query?.sortOrder) params.append("sortOrder", query.sortOrder);
 
     const queryString = params.toString();
-    const url = `${API_BASE_URL}/api/articles${queryString ? `?${queryString}` : ""}`;
+    const url = `${API_BASE_URL}/api/articles${
+      queryString ? `?${queryString}` : ""
+    }`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -222,9 +221,10 @@ export async function getDashboardStats() {
 }
 
 /**
- * Get user's style guide
+ * Get all style guides for the current user
+ * @deprecated Use useListStyleGuides hook instead
  */
-export async function getUserStyleGuide() {
+export async function listUserStyleGuides() {
   try {
     const { userId } = await auth();
 
@@ -232,34 +232,40 @@ export async function getUserStyleGuide() {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/style-guides/${userId}`,
-      {
-        method: "GET",
-        headers: {
-          "x-clerk-user-id": userId,
-        },
-        cache: "no-store",
-      }
-    );
-
-
-    // Handle 404 - return null if not found
-    if (response.status === 404) {
-      return null;
-    }
+    const response = await fetch(`${API_BASE_URL}/api/style-guides`, {
+      method: "GET",
+      headers: { "x-clerk-user-id": userId },
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error("Failed to get style guide:", errorData);
+      console.error("Failed to get style guides:", errorData);
       throw new Error(
         errorData.error?.message || "스타일 가이드를 불러오는데 실패했습니다"
       );
     }
 
     const result = await response.json();
+    return result.data || [];
+  } catch (error) {
+    console.error("Error getting style guides:", error);
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : "스타일 가이드를 불러오는 중 오류가 발생했습니다"
+    );
+  }
+}
 
-    return result;
+/**
+ * Get user's style guide (returns first one for backward compatibility)
+ * @deprecated Use listUserStyleGuides instead
+ */
+export async function getUserStyleGuide() {
+  try {
+    const guides = await listUserStyleGuides();
+    return guides.length > 0 ? guides[0] : null;
   } catch (error) {
     console.error("Error getting style guide:", error);
     throw new Error(
@@ -270,9 +276,9 @@ export async function getUserStyleGuide() {
   }
 }
 
-
 /**
  * Update a style guide
+ * @deprecated Use useUpdateStyleGuide hook instead
  */
 export async function updateStyleGuideAction(
   guideId: string,
@@ -319,6 +325,7 @@ export async function updateStyleGuideAction(
 
 /**
  * Delete a style guide
+ * @deprecated Use useDeleteStyleGuide hook instead
  */
 export async function deleteStyleGuideAction(guideId: string) {
   try {

@@ -6,13 +6,7 @@
 환경에 따른 명령어를 사용해주세요.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인할 수 있습니다.
@@ -48,10 +42,6 @@ easynext lang ko
 최신버전으로 업데이트
 
 ```sh
-npm i -g @easynext/cli@latest
-# or
-yarn add -g @easynext/cli@latest
-# or
 pnpm add -g @easynext/cli@latest
 ```
 
